@@ -5,201 +5,269 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAYINER BAG CATALOG</title>
     <style>
-        /* --- 全局样式 (复刻参考图风格) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --bg-color: #fff74e; /* 亮黄色背景 */
-            --text-color: #000000; /* 纯黑字体 */
-            --accent-color: #ff4da6; /* 亮粉色强调 */
-            --border-style: 3px solid #000; /* 粗黑边框 */
-            --card-bg: #ffffff; /* 内容卡片白底 */
+            --bg-color: #fff74e;
+            --text-color: #000000;
+            --accent-color: #ff4da6;
+            --border-style: 3px solid #000;
+            --card-bg: #ffffff;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            padding: 0;
+            min-height: 100vh;
         }
 
-        h1, h2, h3 {
-            text-transform: uppercase;
-            font-weight: 900;
-            margin-top: 0;
-        }
+        h1, h2, h3, h4 { text-transform: uppercase; font-weight: 900; }
 
-        /* 通用容器 */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        /* 顶部导航栏 */
+        /* ===== 顶部导航栏 ===== */
         header {
-            border: var(--border-style);
+            border-bottom: var(--border-style);
             background: #000;
             color: #fff;
-            padding: 15px;
+            padding: 18px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+            cursor: pointer;
         }
+
+        header h1:hover { color: var(--accent-color); }
+
+        .header-right { display: flex; align-items: center; gap: 15px; }
+
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            padding: 6px 14px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover { border-color: var(--accent-color); color: var(--accent-color); }
 
         .admin-btn {
             background: var(--accent-color);
             color: #fff;
             border: 2px solid #fff;
-            padding: 5px 15px;
+            padding: 6px 16px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            transition: all 0.2s;
         }
 
-        /* 面包屑导航 */
+        .admin-btn:hover { background: #fff; color: #000; border-color: #000; }
+
+        /* ===== 面包屑 ===== */
         .breadcrumbs {
             font-weight: bold;
-            margin-bottom: 20px;
-            border-bottom: var(--border-style);
+            font-size: 0.9rem;
+            margin: 20px 0;
             padding-bottom: 10px;
-            display: inline-block;
+            border-bottom: 2px dashed #000;
         }
 
-        .breadcrumbs span {
-            cursor: pointer;
-        }
-        .breadcrumbs span:hover {
-            text-decoration: underline;
-        }
+        .breadcrumbs span { cursor: pointer; color: #000; }
+        .breadcrumbs span:hover { text-decoration: underline; color: var(--accent-color); }
+        .breadcrumbs .sep { margin: 0 8px; color: #666; }
 
-        /* --- 页面视图切换逻辑 --- */
-        .view-section {
-            display: none; /* 默认隐藏所有部分 */
-            animation: fadeIn 0.3s ease;
-        }
-        .view-section.active {
-            display: block; /* 激活时显示 */
-        }
+        /* ===== 页面切换 ===== */
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- 1. 首页：分类目录 --- */
+        /* ===== 首页：分类目录 ===== */
+        .section-label {
+            background: #000;
+            color: #fff;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
         }
 
         .category-card {
             background: var(--card-bg);
             border: var(--border-style);
-            padding: 40px 20px;
+            padding: 50px 30px;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 8px 8px 0px #000; /* 硬阴影 */
+            transition: all 0.2s;
+            box-shadow: 8px 8px 0px #000;
+            position: relative;
+            overflow: hidden;
         }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 6px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover::before { transform: scaleX(1); }
 
         .category-card:hover {
             transform: translate(-4px, -4px);
             box-shadow: 12px 12px 0px #000;
         }
 
-        .category-card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: block;
         }
 
-        /* --- 2. 列表页：同类型展示 --- */
+        .category-card h2 { font-size: 1.5rem; margin-bottom: 8px; }
+
+        .category-card .cat-count {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: normal;
+        }
+
+        /* ===== 列表页：产品网格（带悬停切换） ===== */
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 28px;
         }
 
         .product-card {
             background: var(--card-bg);
             border: var(--border-style);
             cursor: pointer;
-            position: relative;
+            transition: all 0.2s;
+            box-shadow: 5px 5px 0px #000;
         }
 
-        .product-img-placeholder {
+        .product-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .image-wrapper {
+            position: relative;
             width: 100%;
-            height: 200px;
-            background-color: #eee;
+            height: 280px;
+            background-color: #f5f5f5;
             border-bottom: var(--border-style);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #ccc;
             overflow: hidden;
         }
-        
-        .product-img-placeholder img {
-            width: 100%;
-            height: 100%;
+
+        .image-wrapper img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             object-fit: cover;
+            transition: opacity 0.4s ease-in-out;
         }
 
-        .product-info {
-            padding: 15px;
-        }
+        .img-default { opacity: 1; z-index: 1; }
+        .img-hover { opacity: 0; z-index: 2; }
+        .image-wrapper:hover .img-hover { opacity: 1; }
+
+        .product-info { padding: 16px; }
 
         .tag {
             background: var(--accent-color);
             color: white;
-            padding: 2px 8px;
-            font-size: 0.8rem;
+            padding: 3px 10px;
+            font-size: 0.75rem;
             font-weight: bold;
             display: inline-block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
         }
 
-        /* --- 3. 详情页：全方位展示 --- */
+        .product-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .product-info .product-material {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .product-info .product-price {
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin-top: 8px;
+            color: var(--accent-color);
+        }
+
+        /* ===== 详情页 ===== */
         .detail-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            gap: 50px;
             background: var(--card-bg);
             border: var(--border-style);
-            padding: 30px;
+            padding: 40px;
             box-shadow: 10px 10px 0px #000;
         }
 
-        .detail-gallery {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .detail-gallery { display: flex; flex-direction: column; gap: 15px; }
 
         .main-image {
             width: 100%;
-            height: 400px;
+            height: 450px;
             background: #f0f0f0;
             border: 2px solid #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
+            position: relative;
         }
-        
+
         .main-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: opacity 0.4s ease;
         }
+
+        .main-image .img-default { opacity: 1; z-index: 1; }
+        .main-image .img-hover { opacity: 0; z-index: 2; }
+        .main-image:hover .img-hover { opacity: 1; }
 
         .thumbnails {
             display: flex;
@@ -207,242 +275,657 @@
         }
 
         .thumb {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             border: 2px solid #000;
             background: #eee;
             cursor: pointer;
             overflow: hidden;
-        }
-        
-        .thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            transition: border-color 0.2s;
         }
 
+        .thumb:hover, .thumb.active { border-color: var(--accent-color); }
+
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
         .detail-info h2 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2.2rem;
+            margin-bottom: 12px;
             border-bottom: 4px solid var(--accent-color);
             display: inline-block;
+        }
+
+        .detail-info .detail-tag {
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .detail-info .detail-desc {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 25px;
         }
 
         .specs-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            border: 2px solid #000;
+            margin: 20px 0 30px;
+            border: var(--border-style);
         }
 
         .specs-table td {
             border: 1px solid #000;
-            padding: 10px;
+            padding: 12px 15px;
             font-weight: bold;
+            font-size: 0.95rem;
         }
 
         .specs-table td:first-child {
-            background: #eee;
-            width: 30%;
+            background: #f0f0f0;
+            width: 35%;
         }
 
-        /* --- 4. 管理员登录与后台 --- */
-        .login-modal, .admin-panel {
-            background: #fff;
-            border: var(--border-style);
-            padding: 40px;
-            max-width: 400px;
-            margin: 50px auto;
-            box-shadow: 10px 10px 0px #000;
-            text-align: center;
+        .btn-primary {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 14px 35px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            box-shadow: 4px 4px 0px #000;
         }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 2px solid #000;
-            font-family: inherit;
-            box-sizing: border-box;
+        .btn-primary:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000;
         }
 
-        button.action-btn {
+        .btn-back {
             background: #000;
             color: #fff;
             border: none;
             padding: 10px 20px;
             font-weight: bold;
             cursor: pointer;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover { background: var(--accent-color); }
+
+        /* ===== 管理员后台 ===== */
+        .admin-panel {
+            background: #fff;
+            border: var(--border-style);
+            padding: 40px;
+            max-width: 700px;
+            margin: 30px auto;
+            box-shadow: 10px 10px 0px #000;
+        }
+
+        .admin-panel h2 { margin-bottom: 8px; font-size: 1.8rem; }
+        .admin-panel .subtitle { color: #666; margin-bottom: 25px; font-size: 0.9rem; }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            margin-top: 10px;
-        }
-        
-        button.action-btn:hover {
-            background: var(--accent-color);
+            padding: 10px 14px;
+            border: 2px solid #000;
+            font-size: 1rem;
+            font-family: inherit;
         }
 
-        /* 简单的图片占位符生成器 */
-        .placeholder-text {
-            font-size: 12px;
-            color: #666;
+        .form-group textarea { min-height: 80px; resize: vertical; }
+
+        .admin-product-list {
+            margin-top: 40px;
+            border-top: 2px dashed #000;
+            padding-top: 25px;
+        }
+
+        .admin-product-list h3 { margin-bottom: 15px; }
+
+        .admin-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .admin-item .admin-item-info { flex: 1; }
+        .admin-item .admin-item-name { font-weight: bold; }
+        .admin-item .admin-item-cat { font-size: 0.85rem; color: #666; }
+
+        .admin-item .delete-btn {
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .admin-item .delete-btn:hover { background: #cc0000; }
+
+        .success-msg {
+            background: #4caf50;
+            color: #fff;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* ===== 页脚 ===== */
+        footer {
             text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            font-size: 0.85rem;
+            color: #666;
+            border-top: 2px solid #000;
         }
 
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .detail-layout { grid-template-columns: 1fr; gap: 30px; }
+            .main-image { height: 320px; }
+            header { padding: 14px 20px; }
+            header h1 { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- 顶部 -->
-        <header>
-            <h1 onclick="goHome()" style="cursor:pointer;">RAYINER ARCHIVE</h1>
+    <header>
+        <h1 onclick="goHome()">RAYINER ARCHIVE</h1>
+        <div class="header-right">
+            <span class="nav-link" onclick="goHome()">CATALOG</span>
             <button class="admin-btn" onclick="showLogin()">Admin Login</button>
-        </header>
+        </div>
+    </header>
 
+    <div class="container">
         <!-- 面包屑 -->
         <div id="breadcrumbs" class="breadcrumbs" style="display:none;">
-            <span onclick="goHome()">首页</span> > <span id="current-path">分类</span>
+            <span onclick="goHome()">首页</span>
+            <span class="sep">></span>
+            <span id="current-path">分类</span>
         </div>
 
-        <!-- 1. 首页：分类列表 -->
+        <!-- ===== 1. 首页：分类列表 ===== -->
         <div id="view-home" class="view-section active">
-            <div style="background:#000; color:#fff; padding:10px; margin-bottom:20px; font-weight:bold;">
-                // 选择目录类别 / SELECT CATEGORY
-            </div>
-            <div class="category-grid" id="category-container">
-                <!-- JS 将在这里生成分类 -->
-            </div>
+            <div class="section-label">// 选择目录类别 / SELECT CATEGORY</div>
+            <div class="category-grid" id="category-container"></div>
         </div>
 
-        <!-- 2. 列表页：产品网格 -->
+        <!-- ===== 2. 列表页：产品网格 ===== -->
         <div id="view-list" class="view-section">
-            <h2 id="list-title" style="margin-bottom:20px; font-size:2rem;">CATEGORY NAME</h2>
-            <div class="product-grid" id="product-container">
-                <!-- JS 将在这里生成产品卡片 -->
-            </div>
+            <button class="btn-back" onclick="goHome()">&#8592; 返回首页</button>
+            <h2 id="list-title" style="margin-bottom:25px; font-size:2rem;">CATEGORY NAME</h2>
+            <div class="product-grid" id="product-container"></div>
         </div>
 
-        <!-- 3. 详情页：产品展示 -->
+        <!-- ===== 3. 详情页 ===== -->
         <div id="view-detail" class="view-section">
+            <button class="btn-back" onclick="goBackToList()">&#8592; 返回列表</button>
             <div class="detail-layout">
                 <div class="detail-gallery">
                     <div class="main-image" id="detail-main-img">
-                        <!-- 主图 -->
+                        <img class="img-default" src="" alt="主图">
+                        <img class="img-hover" src="" alt="悬停图">
                     </div>
-                    <div class="thumbnails" id="detail-thumbs">
-                        <!-- 缩略图 -->
-                    </div>
+                    <div class="thumbnails" id="detail-thumbs"></div>
                 </div>
                 <div class="detail-info">
-                    <span class="tag" id="detail-tag">NEW ARRIVAL</span>
+                    <span class="detail-tag" id="detail-tag">NEW ARRIVAL</span>
                     <h2 id="detail-name">BAG NAME</h2>
-                    <p id="detail-desc" style="font-size:1.1rem; line-height:1.6;">Description goes here...</p>
-                    
+                    <p class="detail-desc" id="detail-desc">Description goes here...</p>
+
                     <table class="specs-table">
                         <tr><td>材质 Material</td><td id="spec-material">Leather</td></tr>
                         <tr><td>尺寸 Size</td><td id="spec-size">30x20x10 cm</td></tr>
+                        <tr><td>重量 Weight</td><td id="spec-weight">450g</td></tr>
                         <tr><td>设计风格 Style</td><td id="spec-style">Cyberpunk</td></tr>
+                        <tr><td>颜色 Color</td><td id="spec-color">Black</td></tr>
                     </table>
 
-                    <button class="action-btn" style="background:var(--accent-color);">CONTACT FOR PRICE</button>
+                    <button class="btn-primary">CONTACT FOR PRICE</button>
                 </div>
             </div>
         </div>
 
-        <!-- 4. 管理员登录 -->
+        <!-- ===== 4. 管理员登录 ===== -->
         <div id="view-login" class="view-section">
-            <div class="login-modal">
-                <h2>ADMIN ACCESS</h2>
-                <input type="text" id="username" placeholder="Username">
-                <input type="password" id="password" placeholder="Password">
-                <button class="action-btn" onclick="checkLogin()">ENTER SYSTEM</button>
-                <p id="login-msg" style="color:red; margin-top:10px;"></p>
-                <button onclick="goHome()" style="margin-top:20px; background:none; border:none; text-decoration:underline; cursor:pointer;">Cancel</button>
+            <div style="background:#fff; border:3px solid #000; padding:45px; max-width:420px; margin:60px auto; box-shadow:12px 12px 0px #000; text-align:center;">
+                <h2 style="margin-bottom:25px; font-size:1.8rem;">ADMIN ACCESS</h2>
+                <input type="text" id="username" placeholder="Username" style="width:100%; padding:12px 15px; margin:8px 0; border:2px solid #000; font-size:1rem; font-family:inherit;">
+                <input type="password" id="password" placeholder="Password" style="width:100%; padding:12px 15px; margin:8px 0; border:2px solid #000; font-size:1rem; font-family:inherit;">
+                <button class="action-btn" onclick="checkLogin()" style="background:#000; color:#fff; border:none; padding:12px 30px; font-weight:bold; cursor:pointer; width:100%; margin-top:15px; font-size:1rem; letter-spacing:1px; text-transform:uppercase; transition:all 0.2s;">ENTER SYSTEM</button>
+                <p id="login-msg" style="color:red; margin-top:12px; font-weight:bold; min-height:20px;"></p>
+                <button onclick="goHome()" style="background:none; border:none; color:#666; text-decoration:underline; cursor:pointer; margin-top:15px; font-size:0.9rem;">Cancel</button>
             </div>
         </div>
 
-        <!-- 5. 管理员后台面板 -->
+        <!-- ===== 5. 管理员后台面板 ===== -->
         <div id="view-admin" class="view-section">
-            <div class="admin-panel" style="max-width: 600px;">
+            <div class="admin-panel">
                 <h2>DASHBOARD // ADD ITEM</h2>
-                <p>在此处添加新的包包数据（模拟数据库）</p>
-                
-                <select id="new-cat" style="width:100%; padding:10px; margin-bottom:10px; border:2px solid #000;">
-                    <option value="handbag">手提包</option>
-                    <option value="tote">托特包</option>
-                    <option value="backpack">双肩包</option>
-                </select>
-                
-                <input type="text" id="new-name" placeholder="包包名称 (Name)">
-                <input type="text" id="new-material" placeholder="材质 (Material)">
-                <input type="text" id="new-desc" placeholder="简短描述 (Description)">
-                
-                <button class="action-btn" onclick="addNewItem()">UPLOAD TO CATALOG</button>
-                <button onclick="goHome()" class="action-btn" style="background:#666; margin-top:10px;">EXIT ADMIN</button>
+                <p class="subtitle">在此处添加新的包包到目录中（数据保存在当前浏览器中）</p>
+
+                <div id="success-msg" class="success-msg">已成功添加到目录！</div>
+
+                <div class="form-group">
+                    <label>分类 Category</label>
+                    <select id="new-cat">
+                        <option value="handbag">手提包 Handbags</option>
+                        <option value="tote">托特包 Totes</option>
+                        <option value="backpack">双肩包 Backpacks</option>
+                        <option value="clutch">手拿包 Clutches</option>
+                        <option value="crossbody">斜挎包 Crossbody</option>
+                        <option value="bucket">水桶包 Bucket Bags</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>包包名称 Name</label>
+                    <input type="text" id="new-name" placeholder="例如：RAYINER NO.1 BLACK">
+                </div>
+
+                <div class="form-group">
+                    <label>材质 Material</label>
+                    <input type="text" id="new-material" placeholder="例如：工业帆布 & 铬金属">
+                </div>
+
+                <div class="form-group">
+                    <label>价格 Price</label>
+                    <input type="text" id="new-price" placeholder="例如：1,280 AED">
+                </div>
+
+                <div class="form-group">
+                    <label>简短描述 Description</label>
+                    <input type="text" id="new-desc" placeholder="例如：专为都市游牧设计，采用高强度防水帆布">
+                </div>
+
+                <div class="form-group">
+                    <label>尺寸 Size</label>
+                    <input type="text" id="new-size" placeholder="例如：25cm x 18cm x 8cm">
+                </div>
+
+                <div class="form-group">
+                    <label>重量 Weight</label>
+                    <input type="text" id="new-weight" placeholder="例如：450g">
+                </div>
+
+                <div class="form-group">
+                    <label>设计风格 Style</label>
+                    <input type="text" id="new-style" placeholder="例如：机能风 Techwear">
+                </div>
+
+                <div class="form-group">
+                    <label>颜色 Color</label>
+                    <input type="text" id="new-color" placeholder="例如：黑色 Black">
+                </div>
+
+                <div class="form-group">
+                    <label>标签 Tag</label>
+                    <input type="text" id="new-tag" placeholder="例如：NEW / Y2K / SALE">
+                </div>
+
+                <button class="action-btn" onclick="addNewItem()" style="width:100%; margin-top:10px; background:#000; color:#fff; border:none; padding:12px 30px; font-weight:bold; cursor:pointer; font-size:1rem; letter-spacing:1px; text-transform:uppercase; transition:all 0.2s;">UPLOAD TO CATALOG</button>
+                <button onclick="goHome()" style="background:none; border:none; color:#666; text-decoration:underline; cursor:pointer; display:block; margin:15px auto 0;">EXIT ADMIN</button>
+            </div>
+
+            <div class="admin-panel" style="margin-top:25px;">
+                <h3>当前目录产品列表</h3>
+                <div id="admin-product-list"></div>
             </div>
         </div>
-
     </div>
 
+    <footer>
+        <p>&copy; 2025 RAYINER ARCHIVE. All Rights Reserved.</p>
+    </footer>
+
     <script>
-        // --- 模拟数据库数据 ---
-        const db = {
-            categories: [
-                { id: 'handbag', name: '手提包 Handbags', icon: '👜' },
-                { id: 'tote', name: '托特包 Totes', icon: '🛍️' },
-                { id: 'backpack', name: '双肩包 Backpacks', icon: '🎒' },
-                { id: 'clutch', name: '手拿包 Clutches', icon: '👛' }
-            ],
-            products: [
-                // 示例数据：手提包
-                { 
-                    id: 1, 
-                    catId: 'handbag', 
-                    name: 'RAYINER NO.1 BLACK', 
-                    material: '工业帆布 & 铬金属', 
-                    size: '25cm x 18cm', 
-                    style: '机能风 Techwear',
-                    desc: '专为都市游牧设计，采用高强度防水帆布，配以航空级铝合金扣具。',
-                    color: '#333' // 用颜色模拟图片
-                },
-                { 
-                    id: 2, 
-                    catId: 'handbag', 
-                    name: 'PINK Y2K BAG', 
-                    material: 'PU 皮革', 
-                    size: '20cm x 15cm', 
-                    style: 'Y2K 千禧',
-                    desc: '复古未来主义，高饱和度粉色，搭配银色链条。',
-                    color: '#ff4da6'
-                },
-                // 示例数据：托特包
-                { 
-                    id: 3, 
-                    catId: 'tote', 
-                    name: 'CARGO TOTE LARGE', 
-                    material: '尼龙织带', 
-                    size: '40cm x 35cm', 
-                    style: '工装风 Utility',
-                    desc: '超大容量，多口袋设计，适合通勤与短途旅行。',
-                    color: '#556b2f'
-                }
-            ]
-        };
+        // ===== 默认产品数据（10款示例产品） =====
+        const defaultProducts = [
+            {
+                id: 1, catId: 'handbag', name: 'RAYINER NO.1 BLACK',
+                material: '工业帆布 & 铬金属', price: '1,280 AED',
+                desc: '专为都市游牧设计，采用高强度防水帆布，配以航空级铝合金扣具。硬朗廓形与机能风细节完美融合，适合追求前卫风格的你。',
+                size: '25cm x 18cm x 8cm', weight: '450g', style: '机能风 Techwear', color: '黑色 Black', tag: 'NEW'
+            },
+            {
+                id: 2, catId: 'handbag', name: 'PINK Y2K MINI BAG',
+                material: 'PU 皮革 & 银链条', price: '890 AED',
+                desc: '复古未来主义，高饱和度粉色，搭配银色金属链条。小巧精致的包身可容纳手机和口红，是派对和街拍的绝佳选择。',
+                size: '20cm x 15cm x 6cm', weight: '320g', style: 'Y2K 千禧', color: '粉色 Pink', tag: 'HOT'
+            },
+            {
+                id: 3, catId: 'handbag', name: 'CHROME HEART TOTE',
+                material: '头层牛皮 & 镀铬五金', price: '2,450 AED',
+                desc: '奢华头层牛皮打造，配以做旧镀铬五金件。大容量内里设计，可轻松放入13寸笔记本电脑，商务通勤两不误。',
+                size: '32cm x 24cm x 12cm', weight: '680g', style: '奢华街头 Luxury Street', color: '黑色/银色 Black/Silver', tag: 'PREMIUM'
+            },
+            {
+                id: 4, catId: 'tote', name: 'CARGO TOTE LARGE',
+                material: '尼龙织带 & 多口袋', price: '1,150 AED',
+                desc: '超大容量工装风托特包，多口袋设计满足收纳需求。采用高密度尼龙织带，防水耐磨，适合通勤与短途旅行。',
+                size: '40cm x 35cm x 15cm', weight: '520g', style: '工装风 Utility', color: '军绿色 Olive', tag: 'NEW'
+            },
+            {
+                id: 5, catId: 'tote', name: 'MINIMALIST WHITE TOTE',
+                material: '有机棉帆布', price: '680 AED',
+                desc: '极简主义设计，纯白有机棉帆布材质，环保且耐用。简洁的线条与可拆卸肩带设计，适合日常休闲搭配。',
+                size: '38cm x 30cm x 12cm', weight: '380g', style: '极简 Minimalist', color: '白色 White', tag: 'ECO'
+            },
+            {
+                id: 6, catId: 'backpack', name: 'CYBER PACK 2.0',
+                material: '尼龙 & PVC涂层', price: '1,580 AED',
+                desc: '赛博朋克风格双肩包，PVC涂层尼龙面料防水防刮。内置USB充电口和防盗拉链，科技感十足。',
+                size: '30cm x 42cm x 16cm', weight: '750g', style: '赛博朋克 Cyberpunk', color: '透明/黑色 Clear/Black', tag: 'LIMITED'
+            },
+            {
+                id: 7, catId: 'backpack', name: 'VINTAGE LEATHER BACKPACK',
+                material: '复古做旧牛皮', price: '2,800 AED',
+                desc: '手工制作的复古做旧牛皮双肩包，每一只都有独特的纹理和色泽。经典翻盖设计，尽显复古优雅。',
+                size: '28cm x 38cm x 14cm', weight: '950g', style: '复古 Vintage', color: '棕色 Brown', tag: 'HANDMADE'
+            },
+            {
+                id: 8, catId: 'clutch', name: 'METALLIC CLUTCH',
+                material: '金属感PU & 丝绒内衬', price: '650 AED',
+                desc: '金属质感手拿包，适合晚宴和派对场合。可拆卸链条设计，既可手拿也可斜挎。',
+                size: '28cm x 16cm x 5cm', weight: '280g', style: '晚宴 Glam', color: '金色 Gold', tag: 'PARTY'
+            },
+            {
+                id: 9, catId: 'crossbody', name: 'CHAIN CROSSBODY',
+                material: '小牛皮 & 金属链条', price: '1,350 AED',
+                desc: '精致小牛皮斜挎包，搭配粗犷金属链条，刚柔并济。可调节肩带设计，多种背法随心切换。',
+                size: '22cm x 14cm x 7cm', weight: '380g', style: '轻奢 Chic', color: '白色/黑色 White/Black', tag: 'BESTSELLER'
+            },
+            {
+                id: 10, catId: 'bucket', name: 'BUCKET BAG MINI',
+                material: '软牛皮 & 抽绳设计', price: '980 AED',
+                desc: '迷你水桶包，软糯牛皮材质手感极佳。抽绳收口设计独特，搭配可调节肩带，随性又时髦。',
+                size: '20cm x 25cm x 12cm', weight: '420g', style: '休闲 Casual', color: '米色 Beige', tag: 'TRENDING'
+            }
+        ];
 
-        let currentCategory = null;
+        // ===== 分类数据 =====
+        const categories = [
+            { id: 'handbag', name: '手提包', en: 'Handbags', icon: '\u{1F45C}', count: 3 },
+            { id: 'tote', name: '托特包', en: 'Totes', icon: '\u{1F6CD}\uFE0F', count: 2 },
+            { id: 'backpack', name: '双肩包', en: 'Backpacks', icon: '\u{1F392}', count: 2 },
+            { id: 'clutch', name: '手拿包', en: 'Clutches', icon: '\u{1F45B}', count: 1 },
+            { id: 'crossbody', name: '斜挎包', en: 'Crossbody', icon: '\u{1F45D}', count: 1 },
+            { id: 'bucket', name: '水桶包', en: 'Bucket Bags', icon: '\u{1F6E1}\uFE0F', count: 1 }
+        ];
 
-        // --- 初始化 ---
+        // ===== 图片占位服务 =====
+        function getDefaultImg(seed) {
+            return 'https://picsum.photos/seed/rayiner' + seed + '/400/500';
+        }
+        function getHoverImg(seed) {
+            return 'https://picsum.photos/seed/rayiner' + seed + 'hq/400/500';
+        }
+
+        // ===== 初始化 =====
+        let products = [];
+        let currentCat = null;
+
         window.onload = function() {
+            const saved = localStorage.getItem('rayiner_products');
+            if (saved) {
+                products = JSON.parse(saved);
+            } else {
+                products = [...defaultProducts];
+                saveProducts();
+            }
             renderCategories();
         };
 
-        // --- 渲染首页分类 ---
+        function saveProducts() {
+            localStorage.setItem('rayiner_products', JSON.stringify(products));
+        }
+
+        // ===== 渲染首页分类 =====
         function renderCategories() {
             const container = document.getElementById('category-container');
             container.innerHTML = '';
-            db.categories.forEach(cat => {
+            categories.forEach(cat => {
+                const count = products.filter(p => p.catId === cat.id).length;
                 const div = document.createElement('div');
                 div.className = 'category-card';
-                div.innerHTML = `
-                    <div style="font-size:3rem; margin-bottom:10px;">${cat.icon}</div>
-                    <h2
+                div.onclick = () => showCategory(cat.id, cat.name + ' ' + cat.en);
+                div.innerHTML = '
+                    <span class="category-icon">' + cat.icon + '</span>
+                    <h2>' + cat.name + '<br><small style="font-size:0.7em; color:#666;">' + cat.en + '</small></h2>
+                    <p class="cat-count">' + count + ' 件产品</p>
+                ';
+                container.appendChild(div);
+            });
+        }
+
+        // ===== 显示分类列表 =====
+        function showCategory(catId, catName) {
+            currentCat = catId;
+            document.getElementById('view-home').classList.remove('active');
+            document.getElementById('view-list').classList.add('active');
+            document.getElementById('breadcrumbs').style.display = 'block';
+            document.getElementById('current-path').textContent = catName;
+            document.getElementById('list-title').textContent = catName;
+
+            const catProducts = products.filter(p => p.catId === catId);
+            const container = document.getElementById('product-container');
+            container.innerHTML = '';
+
+            if (catProducts.length === 0) {
+                container.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:60px; font-size:1.2rem; color:#666;">该分类下暂无产品</p>';
+                return;
+            }
+
+            catProducts.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => showDetail(p.id);
+                card.innerHTML = '
+                    <div class="image-wrapper">
+                        <img class="img-default" src="' + getDefaultImg(p.id) + '" alt="' + p.name + '">
+                        <img class="img-hover" src="' + getHoverImg(p.id) + '" alt="' + p.name + '">
+                    </div>
+                    <div class="product-info">
+                        <span class="tag">' + (p.tag || 'NEW') + '</span>
+                        <h3>' + p.name + '</h3>
+                        <p class="product-material">' + p.material + '</p>
+                        <p class="product-price">' + (p.price || 'CONTACT') + '</p>
+                    </div>
+                ';
+                container.appendChild(card);
+            });
+        }
+
+        // ===== 显示详情页 =====
+        function showDetail(productId) {
+            const p = products.find(prod => prod.id === productId);
+            if (!p) return;
+
+            document.getElementById('view-list').classList.remove('active');
+            document.getElementById('view-detail').classList.add('active');
+            document.getElementById('current-path').textContent = p.name;
+
+            document.getElementById('detail-name').textContent = p.name;
+            document.getElementById('detail-tag').textContent = p.tag || 'NEW ARRIVAL';
+            document.getElementById('detail-desc').textContent = p.desc;
+            document.getElementById('spec-material').textContent = p.material;
+            document.getElementById('spec-size').textContent = p.size;
+            document.getElementById('spec-weight').textContent = p.weight;
+            document.getElementById('spec-style').textContent = p.style;
+            document.getElementById('spec-color').textContent = p.color;
+
+            const mainImg = document.getElementById('detail-main-img');
+            mainImg.innerHTML = '
+                <img class="img-default" src="' + getDefaultImg(p.id) + '" alt="' + p.name + '">
+                <img class="img-hover" src="' + getHoverImg(p.id) + '" alt="' + p.name + '">
+            ';
+
+            const thumbs = document.getElementById('detail-thumbs');
+            thumbs.innerHTML = '';
+            const angles = ['正面 Front', '侧面 Side', '背面 Back', '细节 Detail'];
+            angles.forEach((angle, i) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'thumb' + (i === 0 ? ' active' : '');
+                thumb.onclick = function() {
+                    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    mainImg.querySelector('.img-default').src = 'https://picsum.photos/seed/rayiner' + p.id + 'a' + i + '/400/500';
+                    mainImg.querySelector('.img-hover').src = 'https://picsum.photos/seed/rayiner' + p.id + 'a' + i + 'hq/400/500';
+                };
+                thumb.innerHTML = '<img src="https://picsum.photos/seed/rayiner' + p.id + 'a' + i + '/100/100" alt="' + angle + '">';
+                thumbs.appendChild(thumb);
+            });
+
+            window.scrollTo(0, 0);
+        }
+
+        // ===== 导航函数 =====
+        function goHome() {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-home').classList.add('active');
+            document.getElementById('breadcrumbs').style.display = 'none';
+            renderCategories();
+            window.scrollTo(0, 0);
+        }
+
+        function goBackToList() {
+            if (currentCat) {
+                const cat = categories.find(c => c.id === currentCat);
+                showCategory(currentCat, cat ? cat.name + ' ' + cat.en : '分类');
+            } else {
+                goHome();
+            }
+        }
+
+        // ===== 登录 =====
+        function showLogin() {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-login').classList.add('active');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-msg').textContent = '';
+        }
+
+        function checkLogin() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+
+            if (user === 'RAYINER' && pass === 'a1532953204+') {
+                document.getElementById('view-login').classList.remove('active');
+                document.getElementById('view-admin').classList.add('active');
+                renderAdminList();
+            } else {
+                document.getElementById('login-msg').textContent = '账号或密码错误 / Invalid credentials';
+            }
+        }
+
+        // ===== 管理员：添加产品 =====
+        function addNewItem() {
+            const newP = {
+                id: Date.now(),
+                catId: document.getElementById('new-cat').value,
+                name: document.getElementById('new-name').value.trim() || '未命名产品',
+                material: document.getElementById('new-material').value.trim() || '-',
+                price: document.getElementById('new-price').value.trim() || 'CONTACT',
+                desc: document.getElementById('new-desc').value.trim() || '暂无描述',
+                size: document.getElementById('new-size').value.trim() || '-',
+                weight: document.getElementById('new-weight').value.trim() || '-',
+                style: document.getElementById('new-style').value.trim() || '-',
+                color: document.getElementById('new-color').value.trim() || '-',
+                tag: document.getElementById('new-tag').value.trim() || 'NEW'
+            };
+
+            products.push(newP);
+            saveProducts();
+
+            const msg = document.getElementById('success-msg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+
+            ['new-name','new-material','new-price','new-desc','new-size','new-weight','new-style','new-color','new-tag'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+
+            renderAdminList();
+        }
+
+        // ===== 管理员：删除产品 =====
+        function deleteProduct(id) {
+            if (confirm('确定要删除这个产品吗？')) {
+                products = products.filter(p => p.id !== id);
+                saveProducts();
+                renderAdminList();
+            }
+        }
+
+        // ===== 管理员：渲染产品列表 =====
+        function renderAdminList() {
+            const container = document.getElementById('admin-product-list');
+            container.innerHTML = '';
+
+            if (products.length === 0) {
+                container.innerHTML = '<p style="color:#666;">暂无产品</p>';
+                return;
+            }
+
+            products.forEach(p => {
+                const cat = categories.find(c => c.id === p.catId);
+                const item = document.createElement('div');
+                item.className = 'admin-item';
+                item.innerHTML = '
+                    <div style="width:60px;height:60px;background:#eee;border:2px solid #000;overflow:hidden;flex-shrink:0;">
+                        <img src="https://picsum.photos/seed/rayiner' + p.id + '/100/100" style="width:100%;height:100%;object-fit:cover;">
+                    </div>
+                    <div class="admin-item-info">
+                        <div class="admin-item-name">' + p.name + '</div>
+                        <div class="admin-item-cat">' + (cat ? cat.name : p.catId) + ' | ' + p.material + ' | ' + p.price + '</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteProduct(' + p.id + ')">删除 DELETE</button>
+                ';
+                container.appendChild(item);
+            });
+        }
+
+        // 回车键登录
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && document.getElementById('view-login').classList.contains('active')) {
+                checkLogin();
+            }
+        });
+    </script>
+</body>
+</html>
