@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAYINER BAG CATALOG</title>
+    <style>
+        /* === 全局样式 - 亮黄朋克风 === */
+        :root {
+            --bg-color: #fff74e;
+            --text-color: #000000;
+            --accent-color: #ff4da6;
+            --border-style: 3px solid #000;
+            --card-bg: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4 { text-transform: uppercase; font-weight: 900; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* === 顶部导航栏 === */
+        header {
+            border: var(--border-style);
+            background: #000;
+            color: #fff;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+        }
+        .admin-btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 6px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        .admin-btn:hover { background: #ff1a8a; }
+
+        /* === 面包屑 === */
+        .breadcrumbs {
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: var(--border-style);
+            padding-bottom: 10px;
+            display: inline-block;
+            width: 100%;
+        }
+        .breadcrumbs span { cursor: pointer; }
+        .breadcrumbs span:hover { text-decoration: underline; }
+
+        /* === 页面视图切换 === */
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === 首页：分类目录 === */
+        .category-banner {
+            background: #000; color: #fff; padding: 12px 20px;
+            margin-bottom: 25px; font-weight: bold; font-size: 0.95rem;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+        }
+        .category-card {
+            background: var(--card-bg);
+            border: var(--border-style);
+            padding: 50px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 8px 8px 0px #000;
+        }
+        .category-card:hover {
+            transform: translate(-5px, -5px);
+            box-shadow: 13px 13px 0px #000;
+        }
+        .category-card .cat-icon { font-size: 3.5rem; margin-bottom: 15px; }
+        .category-card h2 { font-size: 1.5rem; margin-bottom: 8px; }
+        .category-card .cat-count {
+            font-size: 0.85rem; color: #666; font-weight: normal;
+        }
+
+        /* === 列表页：产品网格 === */
+        .back-btn {
+            background: #000; color: #fff; border: none;
+            padding: 8px 20px; font-weight: bold; cursor: pointer;
+            margin-bottom: 20px; font-family: inherit;
+            text-transform: uppercase; font-size: 0.85rem;
+        }
+        .back-btn:hover { background: var(--accent-color); }
+        .list-title {
+            margin-bottom: 25px; font-size: 2.2rem;
+            border-bottom: 4px solid var(--accent-color);
+            display: inline-block;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .product-card {
+            background: var(--card-bg);
+            border: var(--border-style);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 5px 5px 0px #000;
+        }
+        .product-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 8px 8px 0px #000;
+        }
+        /* 悬停切换图片容器 */
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background-color: #f0f0f0;
+            border-bottom: var(--border-style);
+            overflow: hidden;
+        }
+        .image-wrapper img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .img-default { opacity: 1; z-index: 1; }
+        .img-hover { opacity: 0; z-index: 2; }
+        .image-wrapper:hover .img-hover { opacity: 1; }
+
+        .product-info { padding: 15px 20px; }
+        .tag {
+            background: var(--accent-color); color: white;
+            padding: 2px 10px; font-size: 0.75rem;
+            font-weight: bold; display: inline-block;
+            margin-bottom: 8px; text-transform: uppercase;
+        }
+        .product-info h3 {
+            font-size: 1.1rem; margin-bottom: 6px; line-height: 1.3;
+        }
+        .product-info .product-material {
+            font-size: 0.85rem; color: #555; margin-bottom: 4px;
+        }
+        .product-info .product-price {
+            font-size: 1.2rem; font-weight: 900; margin-top: 8px;
+        }
+
+        /* === 详情页 === */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            background: var(--card-bg);
+            border: var(--border-style);
+            padding: 40px;
+            box-shadow: 10px 10px 0px #000;
+        }
+        .detail-gallery { display: flex; flex-direction: column; gap: 15px; }
+        .main-image {
+            width: 100%; height: 450px;
+            background: #f5f5f5; border: 2px solid #000;
+            overflow: hidden; position: relative;
+        }
+        .main-image img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .main-image .img-default { opacity: 1; z-index: 1; }
+        .main-image .img-hover { opacity: 0; z-index: 2; }
+        .main-image:hover .img-hover { opacity: 1; }
+        .thumbnails { display: flex; gap: 10px; }
+        .thumb {
+            width: 80px; height: 80px; border: 2px solid #000;
+            background: #eee; cursor: pointer; overflow: hidden;
+        }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb.active { border-color: var(--accent-color); }
+
+        .detail-info h2 {
+            font-size: 2.5rem; margin-bottom: 10px;
+            border-bottom: 4px solid var(--accent-color);
+            display: inline-block;
+        }
+        .detail-info .detail-desc {
+            font-size: 1.1rem; line-height: 1.8; margin: 20px 0;
+        }
+        .specs-table {
+            width: 100%; border-collapse: collapse;
+            margin: 25px 0; border: 2px solid #000;
+        }
+        .specs-table td {
+            border: 1px solid #000; padding: 12px 15px;
+            font-weight: bold; font-size: 0.95rem;
+        }
+        .specs-table td:first-child {
+            background: #f0f0f0; width: 35%;
+        }
+        .detail-actions { margin-top: 30px; display: flex; gap: 15px; }
+        .action-btn {
+            background: var(--accent-color); color: #fff;
+            border: 2px solid #000; padding: 12px 30px;
+            font-weight: bold; cursor: pointer;
+            text-transform: uppercase; font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .action-btn:hover { background: #ff1a8a; }
+        .action-btn.secondary { background: #000; }
+        .action-btn.secondary:hover { background: #333; }
+
+        /* === 管理员登录 === */
+        .login-box {
+            background: #fff; border: var(--border-style);
+            padding: 50px; max-width: 420px;
+            margin: 60px auto; box-shadow: 10px 10px 0px #000;
+            text-align: center;
+        }
+        .login-box h2 { margin-bottom: 25px; font-size: 1.8rem; }
+        .login-box input {
+            width: 100%; padding: 12px; margin: 10px 0;
+            border: 2px solid #000; font-family: inherit;
+            font-size: 1rem;
+        }
+        .login-box button {
+            width: 100%; padding: 12px; margin-top: 15px;
+            background: #000; color: #fff; border: none;
+            font-weight: bold; cursor: pointer;
+            text-transform: uppercase; font-size: 1rem;
+            font-family: inherit;
+        }
+        .login-box button:hover { background: var(--accent-color); }
+        .login-msg { color: red; margin-top: 15px; font-weight: bold; }
+
+        /* === 管理员后台 === */
+        .admin-panel {
+            background: #fff; border: var(--border-style);
+            padding: 40px; max-width: 700px;
+            margin: 30px auto; box-shadow: 10px 10px 0px #000;
+        }
+        .admin-panel h2 { margin-bottom: 25px; font-size: 1.8rem; }
+        .admin-panel label {
+            display: block; margin-top: 15px;
+            font-weight: bold; margin-bottom: 5px;
+        }
+        .admin-panel input, .admin-panel select, .admin-panel textarea {
+            width: 100%; padding: 10px; border: 2px solid #000;
+            font-family: inherit; font-size: 0.95rem;
+        }
+        .admin-panel textarea { height: 80px; resize: vertical; }
+        .admin-panel button {
+            width: 100%; padding: 12px; margin-top: 20px;
+            background: #000; color: #fff; border: none;
+            font-weight: bold; cursor: pointer;
+            text-transform: uppercase; font-size: 1rem;
+            font-family: inherit;
+        }
+        .admin-panel button:hover { background: var(--accent-color); }
+        .admin-panel .exit-btn {
+            background: #666; margin-top: 10px;
+        }
+        .admin-panel .exit-btn:hover { background: #333; }
+
+        /* 产品管理列表 */
+        .admin-product-list { margin-top: 40px; border-top: 2px solid #000; padding-top: 20px; }
+        .admin-product-item {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 12px;
+            border: 1px solid #ccc; margin-bottom: 8px;
+        }
+        .admin-product-item .item-info { flex: 1; }
+        .admin-product-item .item-name { font-weight: bold; }
+        .admin-product-item .item-cat { font-size: 0.85rem; color: #666; }
+        .delete-btn {
+            background: #ff3333; color: #fff; border: 2px solid #000;
+            padding: 6px 15px; cursor: pointer; font-weight: bold;
+            font-family: inherit;
+        }
+        .delete-btn:hover { background: #cc0000; }
+
+        /* === 页脚 === */
+        footer {
+            text-align: center; padding: 40px 0 20px;
+            margin-top: 60px; font-size: 0.85rem;
+            border-top: 2px solid #000;
+        }
+
+        /* === 响应式 === */
+        @media (max-width: 768px) {
+            .detail-layout { grid-template-columns: 1fr; }
+            .main-image { height: 350px; }
+            header { flex-direction: column; gap: 10px; }
+        }
+
+        /* === 空状态 === */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            font-size: 1.2rem; color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 顶部导航 -->
+    <header>
+        <h1 onclick="goHome()">RAYINER ARCHIVE</h1>
+        <button class="admin-btn" onclick="showLogin()">Admin Login</button>
+    </header>
+
+    <!-- 面包屑 -->
+    <div id="breadcrumbs" class="breadcrumbs" style="display:none;">
+        <span onclick="goHome()">首页</span> > <span id="current-path"></span>
+    </div>
+
+    <!-- 1. 首页：分类列表 -->
+    <div id="view-home" class="view-section active">
+        <div class="category-banner">// 选择目录类别 / SELECT CATEGORY</div>
+        <div class="category-grid" id="category-container"></div>
+    </div>
+
+    <!-- 2. 列表页：产品网格 -->
+    <div id="view-list" class="view-section">
+        <button class="back-btn" onclick="goHome()">← 返回首页</button>
+        <h2 id="list-title" class="list-title">CATEGORY NAME</h2>
+        <div class="product-grid" id="product-container"></div>
+        <div id="empty-list" class="empty-state" style="display:none;">
+            该分类下暂无产品
+        </div>
+    </div>
+
+    <!-- 3. 详情页 -->
+    <div id="view-detail" class="view-section">
+        <button class="back-btn" onclick="goBackToList()">← 返回列表</button>
+        <div class="detail-layout" id="detail-content"></div>
+    </div>
+
+    <!-- 4. 管理员登录 -->
+    <div id="view-login" class="view-section">
+        <div class="login-box">
+            <h2>ADMIN ACCESS</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="checkLogin()">ENTER SYSTEM</button>
+            <p id="login-msg" class="login-msg"></p>
+            <button onclick="goHome()" style="background:#666; margin-top:10px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- 5. 管理员后台 -->
+    <div id="view-admin" class="view-section">
+        <div class="admin-panel">
+            <h2>DASHBOARD // ADD ITEM</h2>
+            <p style="margin-bottom:20px; color:#666;">在此处添加新的包包到目录中</p>
+
+            <label>分类 Category</label>
+            <select id="new-cat">
+                <option value="handbag">手提包 Handbags</option>
+                <option value="tote">托特包 Totes</option>
+                <option value="backpack">双肩包 Backpacks</option>
+                <option value="clutch">手拿包 Clutches</option>
+                <option value="crossbody">斜挎包 Crossbody</option>
+                <option value="bucket">水桶包 Bucket Bags</option>
+            </select>
+
+            <label>产品名称 Name</label>
+            <input type="text" id="new-name" placeholder="例如: RAYINER NO.1 BLACK">
+
+            <label>材质 Material</label>
+            <input type="text" id="new-material" placeholder="例如: 工业帆布 & 铬金属">
+
+            <label>价格 Price</label>
+            <input type="text" id="new-price" placeholder="例如: 1,280 AED">
+
+            <label>简短描述 Description</label>
+            <textarea id="new-desc" placeholder="产品的简短描述..."></textarea>
+
+            <label>尺寸 Size</label>
+            <input type="text" id="new-size" placeholder="例如: 25cm x 18cm x 10cm">
+
+            <label>设计风格 Style</label>
+            <input type="text" id="new-style" placeholder="例如: 机能风 Techwear">
+
+            <label>颜色 Color</label>
+            <input type="text" id="new-color" placeholder="例如: 黑色 Black">
+
+            <label>标签 Tag</label>
+            <input type="text" id="new-tag" placeholder="例如: NEW / Y2K / UTILITY">
+
+            <label>主图URL (默认图)</label>
+            <input type="text" id="new-img1" placeholder="https://example.com/image1.jpg">
+
+            <label>悬停图URL (悬停时显示)</label>
+            <input type="text" id="new-img2" placeholder="https://example.com/image2.jpg">
+
+            <button onclick="addNewItem()">UPLOAD TO CATALOG</button>
+            <button class="exit-btn" onclick="goHome()">EXIT ADMIN</button>
+
+            <!-- 产品管理列表 -->
+            <div class="admin-product-list">
+                <h3>现有产品管理 Manage Products</h3>
+                <div id="admin-product-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2025 RAYINER ARCHIVE. All Rights Reserved.</p>
+</footer>
+
+<script>
+// === 默认产品数据 ===
+const defaultProducts = [
+    {
+        id: 1, catId: 'handbag', name: 'RAYINER NO.1 BLACK',
+        material: '工业帆布 & 铬金属', price: '1,280 AED',
+        desc: '专为都市游牧设计，采用高强度防水帆布，配以航空级铝合金扣具。适合日常通勤与街头穿搭。',
+        size: '25cm x 18cm x 10cm', style: '机能风 Techwear',
+        color: '黑色 Black', tag: 'NEW',
+        img1: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=500&fit=crop'
+    },
+    {
+        id: 2, catId: 'handbag', name: 'PINK Y2K MINI BAG',
+        material: 'PU 皮革 & 银链条', price: '890 AED',
+        desc: '复古未来主义，高饱和度粉色，搭配银色金属链条。千禧年风格的完美诠释。',
+        size: '20cm x 15cm x 8cm', style: 'Y2K 千禧',
+        color: '粉色 Pink', tag: 'Y2K',
+        img1: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=500&fit=crop'
+    },
+    {
+        id: 3, catId: 'handbag', name: 'CHAIN LUXE TOTE',
+        material: '小牛皮 & 金色金属', price: '2,450 AED',
+        desc: '奢华质感小牛皮，搭配粗犷金色链条，兼具优雅与个性。',
+        size: '28cm x 22cm x 12cm', style: '轻奢 Luxury',
+        color: '白色 White', tag: 'LUXE',
+        img1: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=500&fit=crop'
+    },
+    {
+        id: 4, catId: 'tote', name: 'CARGO TOTE LARGE',
+        material: '尼龙织带 & 多口袋', price: '1,150 AED',
+        desc: '超大容量，多口袋设计，适合通勤与短途旅行。工装风与实用性的完美结合。',
+        size: '40cm x 35cm x 15cm', style: '工装风 Utility',
+        color: '军绿 Army Green', tag: 'UTILITY',
+        img1: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop'
+    },
+    {
+        id: 5, catId: 'tote', name: 'CANVAS WEEKEND BAG',
+        material: '有机帆布 & 皮革提手', price: '980 AED',
+        desc: '环保有机帆布材质，搭配天然皮革提手，简约而不失质感。',
+        size: '45cm x 30cm x 20cm', style: '极简 Minimalist',
+        color: '米色 Beige', tag: 'ECO',
+        img1: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop'
+    },
+    {
+        id: 6, catId: 'backpack', name: 'CYBER PACK BLACK',
+        material: '防水尼龙 & USB接口', price: '1,680 AED',
+        desc: '赛博朋克风格双肩包，内置USB充电接口，多隔层收纳系统。',
+        size: '30cm x 42cm x 18cm', style: '赛博朋克 Cyberpunk',
+        color: '黑色 Black', tag: 'TECH',
+        img1: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop'
+    },
+    {
+        id: 7, catId: 'backpack', name: 'PASTEL Y2K BACKPACK',
+        material: 'PU皮革 & 彩色织带', price: '1,050 AED',
+        desc: '柔和 pastel 色调搭配彩色织带装饰，Y2K 复古未来主义风格。',
+        size: '28cm x 38cm x 15cm', style: 'Y2K 千禧',
+        color: '淡紫 Lavender', tag: 'Y2K',
+        img1: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop'
+    },
+    {
+        id: 8, catId: 'clutch', name: 'METALLIC CLUTCH GOLD',
+        material: '金属光泽 PU', price: '680 AED',
+        desc: '金属光泽手拿包，派对与晚宴的完美配饰。',
+        size: '28cm x 18cm x 5cm', style: '晚宴 Glam',
+        color: '金色 Gold', tag: 'PARTY',
+        img1: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=500&fit=crop'
+    },
+    {
+        id: 9, catId: 'crossbody', name: 'SMALL CROSSBODY NEO',
+        material: '尼龙 & 塑料扣具', price: '560 AED',
+        desc: '轻便小巧的斜挎包，适合日常出行，解放双手。',
+        size: '22cm x 16cm x 8cm', style: '运动 Sport',
+        color: '亮橙 Orange', tag: 'NEW',
+        img1: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=500&fit=crop'
+    },
+    {
+        id: 10, catId: 'bucket', name: 'BUCKET BAG MINI',
+        material: '软牛皮 & 抽绳设计', price: '1,350 AED',
+        desc: '迷你水桶包，软牛皮材质手感极佳，抽绳设计独具特色。',
+        size: '20cm x 25cm x 20cm', style: '休闲 Casual',
+        color: '棕色 Brown', tag: 'TREND',
+        img1: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=500&fit=crop',
+        img2: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop'
+    }
+];
+
+// === 分类数据 ===
+const categories = [
+    { id: 'handbag', name: '手提包', icon: '👜' },
+    { id: 'tote', name: '托特包', icon: '🛍️' },
+    { id: 'backpack', name: '双肩包', icon: '🎒' },
+    { id: 'clutch', name: '手拿包', icon: '👛' },
+    { id: 'crossbody', name: '斜挎包', icon: '👝' },
+    { id: 'bucket', name: '水桶包', icon: '🪣' }
+];
+
+// === 数据管理（使用 localStorage 持久化） ===
+function getProducts() {
+    const stored = localStorage.getItem('rayiner_products');
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    localStorage.setItem('rayiner_products', JSON.stringify(defaultProducts));
+    return defaultProducts;
+}
+
+function saveProducts(products) {
+    localStorage.setItem('rayiner_products', JSON.stringify(products));
+}
+
+function addProduct(item) {
+    const products = getProducts();
+    item.id = Date.now();
+    products.push(item);
+    saveProducts(products);
+}
+
+function deleteProduct(id) {
+    let products = getProducts();
+    products = products.filter(p => p.id != id);
+    saveProducts(products);
+}
+
+// === 页面导航 ===
+function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(el => {
+        el.classList.remove('active');
+    });
+    document.getElementById(viewId).classList.add('active');
+
+    const breadcrumbs = document.getElementById('breadcrumbs');
+    if (viewId === 'view-home') {
+        breadcrumbs.style.display = 'none';
+    } else {
+        breadcrumbs.style.display = 'block';
+    }
+
+    window.scrollTo(0, 0);
+}
+
+function goHome() {
+    renderCategories();
+    switchView('view-home');
+}
+
+function showLogin() {
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('login-msg').innerText = '';
+    switchView('view-login');
+}
+
+function goBackToList() {
+    renderCategories();
+    switchView('view-home');
+}
+
+// === 渲染首页分类 ===
+function renderCategories() {
+    const products = getProducts();
+    const container = document.getElementById('category-container');
+    container.innerHTML = '';
+
+    categories.forEach(cat => {
+        const count = products.filter(p => p.catId === cat.id).length;
+        const div = document.createElement('div');
+        div.className = 'category-card';
+        div.onclick = () => showCategory(cat.id);
+        div.innerHTML = `
+            <div class="cat-icon">${cat.icon}</div>
+            <h2>${cat.name}</h2>
+            <div class="cat-count">${count} 件产品</div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// === 渲染列表页 ===
+function showCategory(catId) {
+    const cat = categories.find(c => c.id === catId);
+    const products = getProducts().filter(p => p.catId === catId);
+
+    document.getElementById('list-title').innerText = cat.name + ' / ' + catId.toUpperCase();
+    document.getElementById('current-path').innerText = cat.name;
+
+    const container = document.getElementById('product-container');
+    container.innerHTML = '';
+
+    if (products.length === 0) {
+        document.getElementById('empty-list').style.display = 'block';
+    } else {
+        document.getElementById('empty-list').style.display = 'none';
+        products.forEach(product => {
+            const card = createProductCard(product);
+            container.appendChild(card);
+        });
+    }
+
+    switchView('view-list');
+}
+
+function createProductCard(product) {
+    const div = document.createElement('div');
+    div.className = 'product-card';
+    div.onclick = () => showDetail(product.id);
+    div.innerHTML = `
+        <div class="image-wrapper">
+            <img class="img-default" src="${product.img1 || 'https://via.placeholder.com/400x500?text=NO+IMAGE'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/400x500?text=NO+IMAGE'">
+            <img class="img-hover" src="${product.img2 || product.img1 || 'https://via.placeholder.com/400x500?text=NO+IMAGE'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/400x500?text=NO+IMAGE'">
+        </div>
+        <div class="product-info">
+            <span class="tag">${product.tag || 'NEW'}</span>
+            <h3>${product.name}</h3>
+            <div class="product-material">${product.material}</div>
+            <div class="product-price">${product.price}</div>
+        </div>
+    `;
+    return div;
+}
+
+// === 渲染详情页 ===
+function showDetail(productId) {
+    const products = getProducts();
+    const product = products.find(p => p.id == productId);
+    if (!product) {
+        alert('产品不存在');
+        return;
+    }
+
+    document.getElementById('current-path').innerText = product.name;
+
+    const cat = categories.find(c => c.id === product.catId);
+    const catName = cat ? cat.name : product.catId;
+
+    const container = document.getElementById('detail-content');
+    container.innerHTML = `
+        <div class="detail-gallery">
+            <div class="main-image">
+                <img class="img-default" src="${product.img1 || 'https://via.placeholder.com/600x750?text=NO+IMAGE'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/600x750?text=NO+IMAGE'">
+                <img class="img-hover" src="${product.img2 || product.img1 || 'https://via.placeholder.com/600x750?text=NO+IMAGE'}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/600x750?text=NO+IMAGE'">
+            </div>
+            <div class="thumbnails">
+                <div class="thumb active"><img src="${product.img1 || 'https://via.placeholder.com/100?text=1'}" alt="thumb1"></div>
+                <div class="thumb"><img src="${product.img2 || product.img1 || 'https://via.placeholder.com/100?text=2'}" alt="thumb2"></div>
+                <div class="thumb"><img src="https://via.placeholder.com/100?text=3" alt="thumb3"></div>
+                <div class="thumb"><img src="https://via.placeholder.com/100?text=4" alt="thumb4"></div>
+            </div>
+        </div>
+        <div class="detail-info">
+            <span class="tag">${product.tag || 'NEW ARRIVAL'}</span>
+            <h2>${product.name}</h2>
+            <div class="product-price" style="font-size:1.5rem; margin:15px 0;">${product.price}</div>
+            <p class="detail-desc">${product.desc || '暂无描述'}</p>
+
+            <table class="specs-table">
+                <tr><td>材质 Material</td><td>${product.material}</td></tr>
+                <tr><td>尺寸 Size</td><td>${product.size || 'N/A'}</td></tr>
+                <tr><td>重量 Weight</td><td>${product.weight || 'N/A'}</td></tr>
+                <tr><td>设计风格 Style</td><td>${product.style || 'N/A'}</td></tr>
+                <tr><td>颜色 Color</td><td>${product.color || 'N/A'}</td></tr>
+                <tr><td>分类 Category</td><td>${catName}</td></tr>
+            </table>
+
+            <div class="detail-actions">
+                <button class="action-btn">CONTACT FOR PRICE</button>
+                <button class="action-btn secondary" onclick="goBackToList()">← 返回列表</button>
+            </div>
+        </div>
+    `;
+
+    switchView('view-detail');
+}
+
+// === 管理员登录 ===
+function checkLogin() {
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+
+    if (user === 'RAYINER' && pass === 'a1532953204+') {
+        document.getElementById('login-msg').innerText = '';
+        renderAdminProductList();
+        switchView('view-admin');
+    } else {
+        document.getElementById('login-msg').innerText = '账号或密码错误！Access Denied.';
+    }
+}
+
+// === 管理员：渲染产品管理列表 ===
+function renderAdminProductList() {
+    const products = getProducts();
+    const container = document.getElementById('admin-product-list');
+    container.innerHTML = '';
+
+    if (products.length === 0) {
+        container.innerHTML = '<p style="color:#666; padding:10px;">暂无产品</p>';
+        return;
+    }
+
+    products.forEach(p => {
+        const cat = categories.find(c => c.id === p.catId);
+        const catName = cat ? cat.name : p.catId;
+        const div = document.createElement('div');
+        div.className = 'admin-product-item';
+        div.innerHTML = `
+            <div class="item-info">
+                <div class="item-name">${p.name}</div>
+                <div class="item-cat">${catName} | ${p.material} | ${p.price}</div>
+            </div>
+            <button class="delete-btn" onclick="deleteProductItem(${p.id})">DELETE</button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function deleteProductItem(id) {
+    if (confirm('确定要删除这个产品吗？')) {
+        deleteProduct(id);
+        renderAdminProductList();
+    }
+}
+
+// === 管理员：添加新产品 ===
+function addNewItem() {
+    const item = {
+        catId: document.getElementById('new-cat').value,
+        name: document.getElementById('new-name').value.trim(),
+        material: document.getElementById('new-material').value.trim(),
+        price: document.getElementById('new-price').value.trim(),
+        desc: document.getElementById('new-desc').value.trim(),
+        size: document.getElementById('new-size').value.trim(),
+        style: document.getElementById('new-style').value.trim(),
+        color: document.getElementById('new-color').value.trim(),
+        tag: document.getElementById('new-tag').value.trim() || 'NEW',
+        img1: document.getElementById('new-img1').value.trim() || 'https://via.placeholder.com/400x500?text=NO+IMAGE',
+        img2: document.getElementById('new-img2').value.trim() || ''
+    };
+
+    if (!item.name) {
+        alert('请输入产品名称！');
+        return;
+    }
+
+    addProduct(item);
+
+    // 清空表单
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-material').value = '';
+    document.getElementById('new-price').value = '';
+    document.getElementById('new-desc').value = '';
+    document.getElementById('new-size').value = '';
+    document.getElementById('new-style').value = '';
+    document.getElementById('new-color').value = '';
+    document.getElementById('new-tag').value = '';
+    document.getElementById('new-img1').value = '';
+    document.getElementById('new-img2').value = '';
+
+    renderAdminProductList();
+    alert('产品添加成功！Product added successfully.');
+}
+
+// === 初始化 ===
+window.onload = function() {
+    renderCategories();
+};
+
+// 回车键登录
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && document.getElementById('view-login').classList.contains('active')) {
+        checkLogin();
+    }
+});
+</script>
+
+</body>
+</html>
