@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAYINER BAG CATALOG</title>
+    <style>
+        /* --- 全局样式 (复刻参考图风格) --- */
+        :root {
+            --bg-color: #fff74e; /* 亮黄色背景 */
+            --text-color: #000000; /* 纯黑字体 */
+            --accent-color: #ff4da6; /* 亮粉色强调 */
+            --border-style: 3px solid #000; /* 粗黑边框 */
+            --card-bg: #ffffff; /* 内容卡片白底 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3 {
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-top: 0;
+        }
+
+        /* 通用容器 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 顶部导航栏 */
+        header {
+            border: var(--border-style);
+            background: #000;
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .admin-btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* 面包屑导航 */
+        .breadcrumbs {
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: var(--border-style);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .breadcrumbs span {
+            cursor: pointer;
+        }
+        .breadcrumbs span:hover {
+            text-decoration: underline;
+        }
+
+        /* --- 页面视图切换逻辑 --- */
+        .view-section {
+            display: none; /* 默认隐藏所有部分 */
+            animation: fadeIn 0.3s ease;
+        }
+        .view-section.active {
+            display: block; /* 激活时显示 */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 1. 首页：分类目录 --- */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border: var(--border-style);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 8px 8px 0px #000; /* 硬阴影 */
+        }
+
+        .category-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px #000;
+        }
+
+        .category-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        /* --- 2. 列表页：同类型展示 --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: var(--border-style);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-img-placeholder {
+            width: 100%;
+            height: 200px;
+            background-color: #eee;
+            border-bottom: var(--border-style);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #ccc;
+            overflow: hidden;
+        }
+        
+        .product-img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .tag {
+            background: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        /* --- 3. 详情页：全方位展示 --- */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: var(--card-bg);
+            border: var(--border-style);
+            padding: 30px;
+            box-shadow: 10px 10px 0px #000;
+        }
+
+        .detail-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            background: #f0f0f0;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .thumbnails {
+            display: flex;
+            gap: 10px;
+        }
+
+        .thumb {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #000;
+            background: #eee;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detail-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            border-bottom: 4px solid var(--accent-color);
+            display: inline-block;
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border: 2px solid #000;
+        }
+
+        .specs-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            font-weight: bold;
+        }
+
+        .specs-table td:first-child {
+            background: #eee;
+            width: 30%;
+        }
+
+        /* --- 4. 管理员登录与后台 --- */
+        .login-modal, .admin-panel {
+            background: #fff;
+            border: var(--border-style);
+            padding: 40px;
+            max-width: 400px;
+            margin: 50px auto;
+            box-shadow: 10px 10px 0px #000;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #000;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        button.action-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button.action-btn:hover {
+            background: var(--accent-color);
+        }
+
+        /* 简单的图片占位符生成器 */
+        .placeholder-text {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 顶部 -->
+        <header>
+            <h1 onclick="goHome()" style="cursor:pointer;">RAYINER ARCHIVE</h1>
+            <button class="admin-btn" onclick="showLogin()">Admin Login</button>
+        </header>
+
+        <!-- 面包屑 -->
+        <div id="breadcrumbs" class="breadcrumbs" style="display:none;">
+            <span onclick="goHome()">首页</span> > <span id="current-path">分类</span>
+        </div>
+
+        <!-- 1. 首页：分类列表 -->
+        <div id="view-home" class="view-section active">
+            <div style="background:#000; color:#fff; padding:10px; margin-bottom:20px; font-weight:bold;">
+                // 选择目录类别 / SELECT CATEGORY
+            </div>
+            <div class="category-grid" id="category-container">
+                <!-- JS 将在这里生成分类 -->
+            </div>
+        </div>
+
+        <!-- 2. 列表页：产品网格 -->
+        <div id="view-list" class="view-section">
+            <h2 id="list-title" style="margin-bottom:20px; font-size:2rem;">CATEGORY NAME</h2>
+            <div class="product-grid" id="product-container">
+                <!-- JS 将在这里生成产品卡片 -->
+            </div>
+        </div>
+
+        <!-- 3. 详情页：产品展示 -->
+        <div id="view-detail" class="view-section">
+            <div class="detail-layout">
+                <div class="detail-gallery">
+                    <div class="main-image" id="detail-main-img">
+                        <!-- 主图 -->
+                    </div>
+                    <div class="thumbnails" id="detail-thumbs">
+                        <!-- 缩略图 -->
+                    </div>
+                </div>
+                <div class="detail-info">
+                    <span class="tag" id="detail-tag">NEW ARRIVAL</span>
+                    <h2 id="detail-name">BAG NAME</h2>
+                    <p id="detail-desc" style="font-size:1.1rem; line-height:1.6;">Description goes here...</p>
+                    
+                    <table class="specs-table">
+                        <tr><td>材质 Material</td><td id="spec-material">Leather</td></tr>
+                        <tr><td>尺寸 Size</td><td id="spec-size">30x20x10 cm</td></tr>
+                        <tr><td>设计风格 Style</td><td id="spec-style">Cyberpunk</td></tr>
+                    </table>
+
+                    <button class="action-btn" style="background:var(--accent-color);">CONTACT FOR PRICE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 管理员登录 -->
+        <div id="view-login" class="view-section">
+            <div class="login-modal">
+                <h2>ADMIN ACCESS</h2>
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <button class="action-btn" onclick="checkLogin()">ENTER SYSTEM</button>
+                <p id="login-msg" style="color:red; margin-top:10px;"></p>
+                <button onclick="goHome()" style="margin-top:20px; background:none; border:none; text-decoration:underline; cursor:pointer;">Cancel</button>
+            </div>
+        </div>
+
+        <!-- 5. 管理员后台面板 -->
+        <div id="view-admin" class="view-section">
+            <div class="admin-panel" style="max-width: 600px;">
+                <h2>DASHBOARD // ADD ITEM</h2>
+                <p>在此处添加新的包包数据（模拟数据库）</p>
+                
+                <select id="new-cat" style="width:100%; padding:10px; margin-bottom:10px; border:2px solid #000;">
+                    <option value="handbag">手提包</option>
+                    <option value="tote">托特包</option>
+                    <option value="backpack">双肩包</option>
+                </select>
+                
+                <input type="text" id="new-name" placeholder="包包名称 (Name)">
+                <input type="text" id="new-material" placeholder="材质 (Material)">
+                <input type="text" id="new-desc" placeholder="简短描述 (Description)">
+                
+                <button class="action-btn" onclick="addNewItem()">UPLOAD TO CATALOG</button>
+                <button onclick="goHome()" class="action-btn" style="background:#666; margin-top:10px;">EXIT ADMIN</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 模拟数据库数据 ---
+        const db = {
+            categories: [
+                { id: 'handbag', name: '手提包 Handbags', icon: '👜' },
+                { id: 'tote', name: '托特包 Totes', icon: '🛍️' },
+                { id: 'backpack', name: '双肩包 Backpacks', icon: '🎒' },
+                { id: 'clutch', name: '手拿包 Clutches', icon: '👛' }
+            ],
+            products: [
+                // 示例数据：手提包
+                { 
+                    id: 1, 
+                    catId: 'handbag', 
+                    name: 'RAYINER NO.1 BLACK', 
+                    material: '工业帆布 & 铬金属', 
+                    size: '25cm x 18cm', 
+                    style: '机能风 Techwear',
+                    desc: '专为都市游牧设计，采用高强度防水帆布，配以航空级铝合金扣具。',
+                    color: '#333' // 用颜色模拟图片
+                },
+                { 
+                    id: 2, 
+                    catId: 'handbag', 
+                    name: 'PINK Y2K BAG', 
+                    material: 'PU 皮革', 
+                    size: '20cm x 15cm', 
+                    style: 'Y2K 千禧',
+                    desc: '复古未来主义，高饱和度粉色，搭配银色链条。',
+                    color: '#ff4da6'
+                },
+                // 示例数据：托特包
+                { 
+                    id: 3, 
+                    catId: 'tote', 
+                    name: 'CARGO TOTE LARGE', 
+                    material: '尼龙织带', 
+                    size: '40cm x 35cm', 
+                    style: '工装风 Utility',
+                    desc: '超大容量，多口袋设计，适合通勤与短途旅行。',
+                    color: '#556b2f'
+                }
+            ]
+        };
+
+        let currentCategory = null;
+
+        // --- 初始化 ---
+        window.onload = function() {
+            renderCategories();
+        };
+
+        // --- 渲染首页分类 ---
+        function renderCategories() {
+            const container = document.getElementById('category-container');
+            container.innerHTML = '';
+            db.categories.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = 'category-card';
+                div.innerHTML = `
+                    <div style="font-size:3rem; margin-bottom:10px;">${cat.icon}</div>
+                    <h2
